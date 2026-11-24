@@ -1,0 +1,57 @@
+[
+  {
+    "id": "peony",
+    "zhName": "粉牡丹",
+    "enName": "Sarah Bernhardt Peony",
+    "pollenColor": "#F2C5D0",
+    "weight": 1.15,
+    "frameDir": "/sprites/peony",
+    "frameCount": 48,
+    "headYRatio": 0.411,
+    "stemBottomRatio": 0.99
+  },
+  {
+    "id": "crimson-rose",
+    "zhName": "丝绒玫瑰",
+    "enName": "Velvet Crimson Rose",
+    "pollenColor": "#F2B8B8",
+    "weight": 1.1,
+    "frameDir": "/sprites/crimson-rose",
+    "frameCount": 48,
+    "headYRatio": 0.426,
+    "stemBottomRatio": 0.99
+  },
+  {
+    "id": "amber-tulip",
+    "zhName": "金杏郁金香",
+    "enName": "Apricot Double Tulip",
+    "pollenColor": "#F6D48F",
+    "weight": 1.0,
+    "frameDir": "/sprites/amber-tulip",
+    "frameCount": 48,
+    "headYRatio": 0.437,
+    "stemBottomRatio": 0.99
+  },
+  {
+    "id": "iris",
+    "zhName": "暮紫鸢尾",
+    "enName": "Twilight Bearded Iris",
+    "pollenColor": "#D5C4F2",
+    "weight": 0.95,
+    "frameDir": "/sprites/iris",
+    "frameCount": 48,
+    "headYRatio": 0.402,
+    "stemBottomRatio": 0.99
+  },
+  {
+    "id": "camellia",
+    "zhName": "白山茶",
+    "enName": "Ivory Camellia",
+    "pollenColor": "#F5EBD4",
+    "weight": 1.0,
+    "frameDir": "/sprites/camellia",
+    "frameCount": 48,
+    "headYRatio": 0.425,
+    "stemBottomRatio": 0.99
+  }
+]

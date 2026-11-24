@@ -1,0 +1,54 @@
+{
+  "contentrating": "Everyone",
+  "description": "JARDIN 繁花油画交互壁纸：荷兰黄金时代暗调油画，包含粉牡丹、丝绒玫瑰、金杏郁金香、暮紫鸢尾、白山茶。鼠标划过即刻绽放、离开优雅收拢。",
+  "file": "index.html",
+  "general": {
+    "properties": {
+      "ambient_breeze": {
+        "index": 2,
+        "order": 102,
+        "text": "环境微风轻摇 (Ambient Breeze)",
+        "type": "bool",
+        "value": false
+      },
+      "bloom_radius": {
+        "fraction": false,
+        "index": 0,
+        "max": 420,
+        "min": 140,
+        "order": 100,
+        "text": "绽放感应半径 (Bloom Radius px)",
+        "type": "slider",
+        "value": 270
+      },
+      "close_duration": {
+        "fraction": true,
+        "index": 1,
+        "max": 2.5,
+        "min": 0.4,
+        "order": 101,
+        "precision": 1,
+        "step": 0.1,
+        "text": "离开闭合速度 (Close Duration s)",
+        "type": "slider",
+        "value": 1.0
+      },
+      "schemecolor": {
+        "order": 0,
+        "text": "ui_browse_properties_scheme_color",
+        "type": "color",
+        "value": "0.08 0.11 0.08"
+      }
+    }
+  },
+  "preview": "preview.jpg",
+  "tags": [
+    "Art",
+    "Nature",
+    "Flowers",
+    "Interactive"
+  ],
+  "title": "JARDIN 繁花油画 · 交互式动态壁纸",
+  "type": "web",
+  "version": 1
+}

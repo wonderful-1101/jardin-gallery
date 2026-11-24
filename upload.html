@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>发布作品 · JARDIN Archive</title>
+  <link rel="stylesheet" href="./assets/museum.css" />
+  <style>
+    .studio-wrap { max-width: 1080px; margin: 0 auto; padding: 108px 32px 88px; }
+    .studio-head {
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+    }
+    .studio-head h1 { margin: 0; font-family: var(--serif); font-size: 32px; font-weight: 500; color: var(--ink); }
+    .studio-sub { color: var(--muted); font-size: 14px; margin: 8px 0 0; }
+    .studio-grid { display: grid; grid-template-columns: 1fr 1.08fr; gap: 32px; align-items: start; }
+    .panel { background: var(--bg-card); border: 1px solid var(--hairline); border-radius: 3px; padding: 26px; }
+    .drop-zone {
+      border: 1px dashed rgba(212, 175, 106, 0.4);
+      background: radial-gradient(circle at 50% 0%, rgba(212, 175, 106, 0.08), rgba(7, 10, 8, 0.6) 72%);
+      padding: 40px 24px;
+      text-align: center;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.22s ease;
+    }
+    .drop-zone.dragover { border-color: var(--brass-pale); background: rgba(212, 175, 106, 0.14); }
+    .drop-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.2em;
+      color: var(--brass);
+      border: 1px solid var(--brass-line);
+      padding: 3px 10px;
+      margin-bottom: 14px;
+    }
+    .drop-title { font-family: var(--serif); font-size: 20px; color: var(--ink); margin-bottom: 8px; }
+    .drop-hint { font-size: 13px; color: var(--muted); line-height: 1.65; }
+    .folder-pick-row {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .file-picked {
+      margin-top: 16px;
+      padding: 12px 14px;
+      background: rgba(212, 175, 106, 0.1);
+      border: 1px solid var(--brass-line);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--brass-pale);
+      display: none;
+      text-align: left;
+    }
+    .cover-zone {
+      margin-top: 20px;
+      border: 1px dashed rgba(255, 255, 255, 0.16);
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .cover-zone:hover { border-color: var(--brass-line); }
+    .cover-preview { max-width: 100%; max-height: 180px; display: none; margin: 12px auto 0; border: 1px solid var(--hairline); }
+    .field { margin-bottom: 16px; }
+    .field label { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 0.08em; color: var(--ink-soft); margin-bottom: 6px; }
+    .field label span { color: var(--muted); font-size: 11px; }
+    .field input, .field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: #090d0a;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 13.5px;
+      border-radius: 2px;
+      outline: none;
+    }
+    .field input:focus, .field textarea:focus { border-color: var(--brass); }
+    .field textarea { min-height: 70px; resize: vertical; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .submit-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 20px; }
+    .status-box { margin-top: 18px; padding: 14px 16px; border-radius: 2px; font-size: 13.5px; display: none; line-height: 1.65; }
+    .status-box.ok { display: block; background: rgba(84, 155, 108, 0.12); border: 1px solid rgba(114, 198, 140, 0.36); color: #d6f3de; }
+    .status-box.err { display: block; background: rgba(196, 86, 86, 0.12); border: 1px solid rgba(226, 114, 114, 0.38); color: #f7c7c7; }
+    .status-box.info { display: block; background: var(--brass-soft); border: 1px solid var(--brass-line); color: var(--brass-pale); }
+    @media (max-width: 860px) {
+      .studio-grid, .row-2 { grid-template-columns: 1fr; }
+      .studio-wrap { padding: 92px 18px 64px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain-overlay" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand-lockup" href="./">
+      <span class="brand-name">JARDIN</span>
+      <span class="brand-sub">Interactive Archive</span>
+    </a>
+    <nav class="site-nav">
+      <a class="nav-link" href="./#collection">典藏目录</a>
+      <a class="nav-link active" href="./upload.html">发布作品</a>
+      <a class="nav-link" href="./docs.html">上传文档</a>
+    </nav>
+  </header>
+
+  <div class="studio-wrap">
+    <div class="studio-head">
+      <div>
+        <div class="eyebrow">GITHUB PAGES · CURATORIAL STUDIO</div>
+        <h1>发布互动作品</h1>
+        <p class="studio-sub">直连 GitHub 仓库，零服务器部署。把做好的<strong>单个 <code>.html</code> 文件</strong>或整个静态网页目录拖入即可上线。</p>
+      </div>
+      <a class="btn-wire" href="./docs.html">如何获取协作 Token / CLI 文档 →</a>
+    </div>
+
+    <div class="studio-grid">
+      <div class="panel">
+        <div class="drop-zone" id="mainDrop" onclick="document.getElementById('htmlInput').click()">
+          <div class="drop-badge">SINGLE HTML OR FOLDER</div>
+          <div class="drop-title">把 .html 文件拖到这里</div>
+          <div class="drop-hint">单个 .html 会自动设为入口 index.html<br/>如果作品带了图片/JS 子文件，可点下方选择整个文件夹</div>
+          <div class="file-picked" id="mainPicked"></div>
+          <input id="htmlInput" type="file" accept=".html,.htm" hidden />
+          <input id="dirInput" type="file" webkitdirectory multiple hidden />
+        </div>
+        <div class="folder-pick-row">
+          <button class="btn-wire" type="button" onclick="document.getElementById('htmlInput').click()">选择单个 .html</button>
+          <button class="btn-wire" type="button" onclick="document.getElementById('dirInput').click()">选择整个网页文件夹</button>
+        </div>
+
+        <div class="cover-zone" id="coverDrop" onclick="document.getElementById('coverFile').click()">
+          <div style="font-size:13px; color:var(--ink-soft);">可选 · 拖入或选择展厅封面图 (16:10 / JPG / PNG / WebP)</div>
+          <div style="font-size:11.5px; color:var(--muted); margin-top:4px;" id="coverPicked">文件夹内若已有 preview.jpg 可不选</div>
+          <img class="cover-preview" id="coverPreview" alt="封面预览" />
+          <input id="coverFile" type="file" accept="image/*" hidden />
+        </div>
+      </div>
+
+      <form class="panel" id="uploadForm" onsubmit="submitToGitHub(event)">
+        <div class="row-2">
+          <div class="field">
+            <label for="fRepo">GitHub 仓库</label>
+            <input id="fRepo" type="text" value="wonderful-1101/jardin-gallery" required />
+          </div>
+          <div class="field">
+            <label for="fBranch">分支</label>
+            <input id="fBranch" type="text" value="main" required />
+          </div>
+        </div>
+        <div class="field">
+          <label for="fToken">GitHub Token <span>仅需首次填写，存在本机浏览器</span></label>
+          <input id="fToken" type="password" placeholder="填写 Fine-Grained Token (需该仓库 Contents 读写权限)" required />
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="fId">作品英文 ID <span>小写字母/数字/-/_</span></label>
+            <input id="fId" type="text" pattern="^[a-z0-9][a-z0-9-_]{1,63}$" placeholder="例如 aurora-drift" required />
+          </div>
+          <div class="field">
+            <label for="fAuthor">署名作者 / Author</label>
+            <input id="fAuthor" type="text" placeholder="例如 同伴昵称" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="fTitle">展陈标题 / Title <span>必填</span></label>
+          <input id="fTitle" type="text" placeholder="例如 极光浮雪互动壁纸" required />
+        </div>
+        <div class="field">
+          <label for="fTags">分类标签 / Tags <span>逗号分隔</span></label>
+          <input id="fTags" type="text" placeholder="例如 风景,鼠绘互动" />
+        </div>
+        <div class="field">
+          <label for="fDesc">策展简介 / Description</label>
+          <textarea id="fDesc" placeholder="简单描述互动手感或画面风格"></textarea>
+        </div>
+
+        <div class="submit-row">
+          <span style="font-size:12px; color:var(--muted);" id="modeLabel">等待选择作品文件</span>
+          <button class="btn-brass" type="submit" id="submitBtn">提交发布至 GitHub ↗</button>
+        </div>
+        <div class="status-box" id="statusBox"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    var stagedFiles = []; // [{ relPath, file }]
+    var selectedCoverFile = null;
+
+    var repoInput = document.getElementById('fRepo');
+    var tokenInput = document.getElementById('fToken');
+    try {
+      var sr = localStorage.getItem('jardin_gh_repo');
+      var st = localStorage.getItem('jardin_gh_token');
+      if (sr) repoInput.value = sr;
+      if (st) tokenInput.value = st;
+    } catch (e) {}
+
+    function slugify(name) {
+      var stem = String(name || '').replace(/\.(html|htm)$/i, '').toLowerCase();
+      var clean = stem.replace(/[^a-z0-9-_]+/g, '-').replace(/^-+|-+$/g, '');
+      if (!/^[a-z0-9]/.test(clean) || clean.length < 2) clean = 'work-' + Date.now().toString(36);
+      return clean.slice(0, 48);
+    }
+
+    function showStatus(kind, html) {
+      var box = document.getElementById('statusBox');
+      box.className = 'status-box ' + kind;
+      box.innerHTML = html;
+    }
+
+    function pickSingleHtml(file) {
+      if (!file) return;
+      if (!/\.(html|htm)$/i.test(file.name || '')) {
+        showStatus('err', '单文件模式请拖入 .html 或 .htm 文件；多文件工程请点击下方「选择整个网页文件夹」');
+        return;
+      }
+      stagedFiles = [{ relPath: 'index.html', file: file }];
+      var picked = document.getElementById('mainPicked');
+      picked.style.display = 'block';
+      picked.textContent = '[单页 HTML] ' + file.name + ' (' + Math.max(1, Math.round(file.size / 1024)) + ' KB) → 将发布为 index.html';
+      document.getElementById('modeLabel').textContent = '已就绪 · 单页 HTML';
+      if (!document.getElementById('fId').value.trim()) document.getElementById('fId').value = slugify(file.name);
+      if (!document.getElementById('fTitle').value.trim()) document.getElementById('fTitle').value = file.name.replace(/\.(html|htm)$/i, '');
+    }
+
+    function pickDirectory(fileList) {
+      var list = Array.from(fileList || []).filter(function (f) {
+        var rel = f.webkitRelativePath || f.name;
+        return rel && rel.indexOf('/node_modules/') === -1 && rel.indexOf('/.git/') === -1 && !/(\.DS_Store|Thumbs\.db)$/i.test(rel);
+      });
+      if (!list.length) return;
+      var rootFolder = (list[0].webkitRelativePath || '').split('/')[0] || 'work';
+      stagedFiles = list.map(function (f) {
+        var parts = (f.webkitRelativePath || f.name).split('/');
+        var rel = parts.length > 1 ? parts.slice(1).join('/') : f.name;
+        return { relPath: rel, file: f };
+      });
+      if (!stagedFiles.some(function (x) { return x.relPath === 'index.html'; })) {
+        stagedFiles = [];
+        showStatus('err', '所选文件夹根目录缺少 index.html');
+        return;
+      }
+      var picked = document.getElementById('mainPicked');
+      picked.style.display = 'block';
+      picked.textContent = '[网页文件夹] ' + rootFolder + '/ · 共 ' + stagedFiles.length + ' 个文件';
+      document.getElementById('modeLabel').textContent = '已就绪 · ' + stagedFiles.length + ' 个静态文件';
+      if (!document.getElementById('fId').value.trim()) document.getElementById('fId').value = slugify(rootFolder);
+      if (!document.getElementById('fTitle').value.trim()) document.getElementById('fTitle').value = rootFolder;
+    }
+
+    function pickCover(file) {
+      if (!file) return;
+      selectedCoverFile = file;
+      document.getElementById('coverPicked').textContent = '已选封面：' + file.name;
+      var img = document.getElementById('coverPreview');
+      img.src = URL.createObjectURL(file);
+      img.style.display = 'block';
+    }
+
+    var mainDrop = document.getElementById('mainDrop');
+    mainDrop.addEventListener('dragover', function (e) { e.preventDefault(); mainDrop.classList.add('dragover'); });
+    mainDrop.addEventListener('dragleave', function () { mainDrop.classList.remove('dragover'); });
+    mainDrop.addEventListener('drop', function (e) {
+      e.preventDefault();
+      mainDrop.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) pickSingleHtml(e.dataTransfer.files[0]);
+    });
+
+    var coverDrop = document.getElementById('coverDrop');
+    coverDrop.addEventListener('dragover', function (e) { e.preventDefault(); });
+    coverDrop.addEventListener('drop', function (e) {
+      e.preventDefault();
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) pickCover(e.dataTransfer.files[0]);
+    });
+
+    document.getElementById('htmlInput').addEventListener('change', function (e) { pickSingleHtml(e.target.files[0]); });
+    document.getElementById('dirInput').addEventListener('change', function (e) { pickDirectory(e.target.files); });
+    document.getElementById('coverFile').addEventListener('change', function (e) { pickCover(e.target.files[0]); });
+
+    function bytesToBase64(bytes) {
+      var bin = '';
+      var chunk = 0x8000;
+      for (var i = 0; i < bytes.length; i += chunk) {
+        bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+      }
+      return btoa(bin);
+    }
+
+    async function ghApi(repoSlug, path, token, opts) {
+      var res = await fetch('https://api.github.com/repos/' + repoSlug + path, Object.assign({
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Accept': 'application/vnd.github+json',
+          'Content-Type': 'application/json'
+        }
+      }, opts || {}));
+      if (!res.ok) {
+        var txt = await res.text();
+        throw new Error('GitHub API ' + res.status + ': ' + txt.slice(0, 180));
+      }
+      return res.json();
+    }
+
+    async function submitToGitHub(e) {
+      e.preventDefault();
+      if (!stagedFiles.length) {
+        showStatus('err', '请先拖入 .html 文件或选择网页文件夹');
+        return;
+      }
+      var repoSlug = repoInput.value.trim();
+      var branch = document.getElementById('fBranch').value.trim() || 'main';
+      var token = tokenInput.value.trim();
+      var id = document.getElementById('fId').value.trim();
+      var title = document.getElementById('fTitle').value.trim();
+      var author = document.getElementById('fAuthor').value.trim() || 'JARDIN Studio';
+      var tags = document.getElementById('fTags').value.split(/[,，]/).map(function (s) { return s.trim(); }).filter(Boolean);
+      var desc = document.getElementById('fDesc').value.trim();
+
+      try {
+        localStorage.setItem('jardin_gh_repo', repoSlug);
+        localStorage.setItem('jardin_gh_token', token);
+      } catch (err) {}
+
+      var btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      showStatus('info', '正在连接 GitHub 仓库并提交文件...');
+
+      try {
+        var uploadItems = stagedFiles.slice();
+        var coverRel = '';
+        if (selectedCoverFile) {
+          var extM = (selectedCoverFile.name || '').toLowerCase().match(/\.(jpg|jpeg|png|webp|gif)$/);
+          coverRel = 'preview' + (extM ? '.' + extM[1] : '.jpg');
+          uploadItems = uploadItems.filter(function (x) { return x.relPath !== coverRel; });
+          uploadItems.push({ relPath: coverRel, file: selectedCoverFile });
+        } else {
+          var auto = ['preview.jpg', 'preview.jpeg', 'preview.png', 'preview.webp', 'cover.jpg', 'cover.png', 'cover.webp'];
+          var hit = auto.find(function (c) { return uploadItems.some(function (x) { return x.relPath.toLowerCase() === c; }); });
+          if (hit) coverRel = uploadItems.find(function (x) { return x.relPath.toLowerCase() === hit; }).relPath;
+        }
+
+        // 1. Read current manifest
+        var works = [];
+        try {
+          var mfRes = await fetch('https://api.github.com/repos/' + repoSlug + '/contents/works/manifest.json?ref=' + encodeURIComponent(branch), {
+            headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.raw' }
+          });
+          if (mfRes.ok) {
+            var parsed = await mfRes.json();
+            works = Array.isArray(parsed) ? parsed : (parsed.works || []);
+          }
+        } catch (err) {}
+
+        // 2. Get HEAD commit & base tree
+        var refData = await ghApi(repoSlug, '/git/ref/heads/' + encodeURIComponent(branch), token);
+        var headSha = refData.object.sha;
+        var commitData = await ghApi(repoSlug, '/git/commits/' + headSha, token);
+        var baseTreeSha = commitData.tree.sha;
+
+        // 3. Create blobs concurrently
+        var totalBytes = 0;
+        var treeEntries = [];
+        var cursor = 0;
+        var doneCount = 0;
+        var workers = Array.from({ length: Math.min(6, uploadItems.length) }, async function () {
+          while (cursor < uploadItems.length) {
+            var idx = cursor++;
+            var item = uploadItems[idx];
+            var buf = new Uint8Array(await item.file.arrayBuffer());
+            totalBytes += buf.byteLength;
+            var blob = await ghApi(repoSlug, '/git/blobs', token, {
+              method: 'POST',
+              body: JSON.stringify({ content: bytesToBase64(buf), encoding: 'base64' })
+            });
+            treeEntries.push({
+              path: 'works/' + id + '/' + item.relPath,
+              mode: '100644',
+              type: 'blob',
+              sha: blob.sha
+            });
+            doneCount += 1;
+            showStatus('info', '正在上传静态资源 (' + doneCount + '/' + uploadItems.length + ')...');
+          }
+        });
+        await Promise.all(workers);
+
+        // 4. Upsert manifest entry
+        var now = new Date().toISOString();
+        var prevIdx = works.findIndex(function (w) { return w.id === id; });
+        var prev = prevIdx >= 0 ? works[prevIdx] : {};
+        var record = {
+          id: id,
+          title: title,
+          author: author,
+          tags: tags,
+          description: desc,
+          cover: coverRel || prev.cover || '',
+          downloadUrl: prev.downloadUrl || '',
+          fileCount: uploadItems.length,
+          totalBytes: totalBytes,
+          createdAt: prev.createdAt || now,
+          updatedAt: now
+        };
+        if (prevIdx >= 0) works[prevIdx] = record;
+        else works.unshift(record);
+        works.sort(function (a, b) { return String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')); });
+
+        var mfBytes = new TextEncoder().encode(JSON.stringify(works, null, 2) + '\n');
+        var mfBlob = await ghApi(repoSlug, '/git/blobs', token, {
+          method: 'POST',
+          body: JSON.stringify({ content: bytesToBase64(mfBytes), encoding: 'base64' })
+        });
+        treeEntries.push({
+          path: 'works/manifest.json',
+          mode: '100644',
+          type: 'blob',
+          sha: mfBlob.sha
+        });
+
+        // 5. Commit & push atomically
+        showStatus('info', '正在提交至 ' + branch + ' 分支并触发 GitHub Pages 部署...');
+        var newTree = await ghApi(repoSlug, '/git/trees', token, {
+          method: 'POST',
+          body: JSON.stringify({ base_tree: baseTreeSha, tree: treeEntries })
+        });
+        var newCommit = await ghApi(repoSlug, '/git/commits', token, {
+          method: 'POST',
+          body: JSON.stringify({
+            message: 'feat(gallery): publish ' + id,
+            tree: newTree.sha,
+            parents: [headSha]
+          })
+        });
+        await ghApi(repoSlug, '/git/refs/heads/' + encodeURIComponent(branch), token, {
+          method: 'PATCH',
+          body: JSON.stringify({ sha: newCommit.sha })
+        });
+
+        var playUrl = new URL('./play.html?id=' + encodeURIComponent(id), window.location.href).href;
+        showStatus('ok',
+          '<strong>已成功推送至 GitHub！</strong>GitHub Pages 约 30-60 秒构建生效。<br/>' +
+          '稍等半分钟后点击进入展厅：<a style="color:#ecd3a0;text-decoration:underline;" href="' + playUrl + '">' + playUrl + ' ↗</a>'
+        );
+      } catch (err) {
+        showStatus('err', '发布失败：' + (err.message || err));
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

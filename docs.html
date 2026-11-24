@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>上传文档与协作规范 · JARDIN Archive</title>
+  <link rel="stylesheet" href="./assets/museum.css" />
+  <style>
+    .docs-wrap { max-width: 940px; margin: 0 auto; padding: 108px 32px 88px; }
+    .docs-head {
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: 28px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+    }
+    .docs-head h1 { margin: 0; font-family: var(--serif); font-size: 32px; font-weight: 500; color: var(--ink); }
+    .doc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--hairline);
+      border-radius: 3px;
+      padding: 26px 28px;
+      margin-bottom: 20px;
+    }
+    .doc-card h2 { margin: 0 0 12px; font-family: var(--serif); font-size: 20px; font-weight: 500; color: var(--brass-pale); }
+    .doc-card p, .doc-card li { color: var(--ink-soft); font-size: 14.5px; line-height: 1.75; }
+    .pre-wrap { position: relative; margin: 12px 0; }
+    pre {
+      margin: 0;
+      padding: 16px 84px 16px 16px;
+      border-radius: 2px;
+      background: #060907;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e9d6ae;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+    pre.wrap-pre { white-space: pre-wrap; word-break: break-word; }
+    .copy {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 4px 10px;
+      border-radius: 2px;
+      border: 1px solid var(--brass-line);
+      background: var(--brass-soft);
+      color: var(--brass-pale);
+      font-size: 11.5px;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+    }
+    code {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 6px;
+      border-radius: 2px;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      color: var(--brass-pale);
+    }
+    @media (max-width: 720px) {
+      .docs-wrap { padding: 92px 18px 64px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain-overlay" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand-lockup" href="./">
+      <span class="brand-name">JARDIN</span>
+      <span class="brand-sub">Interactive Archive</span>
+    </a>
+    <nav class="site-nav">
+      <a class="nav-link" href="./#collection">典藏目录</a>
+      <a class="nav-link" href="./upload.html">发布作品</a>
+      <a class="nav-link active" href="./docs.html">上传文档</a>
+    </nav>
+  </header>
+
+  <div class="docs-wrap">
+    <div class="docs-head">
+      <div>
+        <div class="eyebrow">GITHUB PAGES · SUBMISSION GUIDE</div>
+        <h1>作品上传与协作文档</h1>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn-wire" href="./docs.md" target="_blank">纯 Markdown (docs.md)</a>
+        <a class="btn-brass" href="./upload.html">打开拖拽发布页 ↗</a>
+      </div>
+    </div>
+
+    <div class="doc-card">
+      <h2>0. 给同事的最省事 3 步</h2>
+      <ol>
+        <li><strong>拿一把仓库专用钥匙：</strong>仓库管理员去 GitHub 生成一个仅限 <code>wonderful-1101/jardin-gallery</code> 单仓库、权限为 <code>Contents: Read and write</code> 的 Fine-Grained Token 发给同事。</li>
+        <li><strong>浏览器直接拖（零命令）：</strong>同事打开 <a href="./upload.html" style="color:var(--brass-pale); text-decoration:underline;">发布作品页</a>，把写好的 <strong>单个 <code>.html</code> 文件</strong>（或整文件夹）拖进去填好标题点发布即可。</li>
+        <li><strong>或者丢给自己的 AI 一句话自动传：</strong>把下面这句发给 Cursor / Claude / Antigravity：</li>
+      </ol>
+      <div class="pre-wrap">
+        <button class="copy" onclick="copyCode(this)">复制</button>
+        <pre class="wrap-pre">请先阅读 <span class="dyn-base">https://wonderful-1101.github.io/jardin-gallery</span>/docs.md 的发布规范，检查我当前的 HTML 互动作品，并用文档里的零依赖 CLI 将其推送到仓库 wonderful-1101/jardin-gallery ，我的 Token 是：&lt;填入Token&gt;。</pre>
+      </div>
+    </div>
+
+    <div class="doc-card">
+      <h2>1. 零依赖 CLI（支持单个 .html 或整目录）</h2>
+      <p>只需本机装有 Node.js 18+，无需 <code>npm install</code>，通过 GitHub API 单次提交推送上线：</p>
+      <div class="pre-wrap">
+        <button class="copy" onclick="copyCode(this)">复制</button>
+        <pre># 下载脚本（Mac / Linux / Git Bash）
+curl -fsSL "<span class="dyn-base">https://wonderful-1101.github.io/jardin-gallery</span>/cli/jardin-push.mjs" -o jardin-push.mjs
+
+# Windows PowerShell 下载命令
+# Invoke-WebRequest -Uri "<span class="dyn-base">https://wonderful-1101.github.io/jardin-gallery</span>/cli/jardin-push.mjs" -OutFile jardin-push.mjs
+
+# 推送单个 .html 文件（自动映射为入口）
+node jardin-push.mjs ./my-artwork.html \
+  --repo "wonderful-1101/jardin-gallery" \
+  --token "你的GitHub_Token" \
+  --id "aurora-drift" \
+  --title "极光流影" \
+  --author "同伴署名" \
+  --tags "风景,鼠标互动" \
+  --cover ./cover.jpg
+
+# 或推送整个网页目录（根目录须有 index.html，内部使用相对路径 ./）
+node jardin-push.mjs ./dist --repo "wonderful-1101/jardin-gallery" --token "你的GitHub_Token" --id "aurora-drift" --title "极光流影"</pre>
+      </div>
+    </div>
+
+    <div class="doc-card">
+      <h2>2. HTML 文件书写小提示</h2>
+      <ul>
+        <li>同事做的如果是<strong>单文件 HTML</strong>（Canvas / WebGL / CSS / JS 都在同一个 <code>.html</code> 里），不用改任何东西，直接拖上去就行。</li>
+        <li>如果引用了外部图片或音频，请放在同一目录并用 <code>./文件名</code> 相对路径引用，千万不要写 <code>C:\Users\...</code> 本地绝对路径。</li>
+        <li>每次上传推送到 GitHub 后，GitHub Pages 通常需要 <strong>30-60 秒</strong>完成静态构建并刷新线上画面。</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    var base = new URL('./', window.location.href).href.replace(/\/+$/, '');
+    document.querySelectorAll('.dyn-base').forEach(function (el) { el.textContent = base; });
+    function copyCode(btn) {
+      var pre = btn.parentElement.querySelector('pre');
+      navigator.clipboard.writeText(pre.innerText).then(function () {
+        var old = btn.textContent;
+        btn.textContent = '已复制 ✓';
+        setTimeout(function () { btn.textContent = old; }, 1400);
+      });
+    }
+  </script>
+</body>
+</html>

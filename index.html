@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JARDIN · 互动艺术典藏馆</title>
+  <link rel="stylesheet" href="./assets/museum.css" />
+  <style>
+    .hero {
+      position: relative;
+      width: 100%;
+      height: clamp(540px, 78vh, 840px);
+      overflow: hidden;
+      border-bottom: 1px solid var(--hairline);
+      background: #060907;
+    }
+    .hero-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      z-index: 1;
+    }
+    .hero-scrim {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        linear-gradient(to top, #070a08 0%, rgba(7, 10, 8, 0.78) 22%, rgba(7, 10, 8, 0.12) 55%, rgba(7, 10, 8, 0.56) 100%),
+        linear-gradient(to right, rgba(7, 10, 8, 0.78) 0%, rgba(7, 10, 8, 0.25) 45%, transparent 72%);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      max-width: 1320px;
+      width: 100%;
+      height: 100%;
+      margin: 0 auto;
+      padding: 88px 32px 52px;
+      display: flex;
+      align-items: flex-end;
+      pointer-events: none;
+    }
+    .hero-plaque {
+      max-width: 620px;
+      pointer-events: none;
+    }
+    .hero-title {
+      margin: 0 0 14px;
+      font-family: var(--serif);
+      font-size: clamp(34px, 5vw, 56px);
+      font-weight: 500;
+      line-height: 1.14;
+      letter-spacing: 0.02em;
+      color: #f6f0e6;
+      text-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
+    }
+    .hero-desc {
+      margin: 0 0 16px;
+      font-size: 15px;
+      line-height: 1.7;
+      color: rgba(242, 236, 225, 0.84);
+    }
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 12.5px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .hero-meta .dot { color: var(--brass); }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      pointer-events: auto;
+    }
+
+    .catalog-wrap {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 64px 32px 96px;
+    }
+    .catalog-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--hairline);
+      margin-bottom: 28px;
+    }
+    .catalog-title-block h2 {
+      margin: 6px 0 0;
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+    }
+    .catalog-count {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      color: var(--brass);
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+    .tab-row { display: flex; flex-wrap: wrap; gap: 20px; }
+    .tab-btn {
+      position: relative;
+      background: transparent;
+      border: 0;
+      padding: 8px 0;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+    .tab-btn:hover, .tab-btn.active { color: var(--brass-pale); }
+    .tab-btn.active::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 1px;
+      background: var(--brass);
+    }
+    .search-line {
+      width: 280px;
+      max-width: 100%;
+      padding: 9px 2px;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+      color: var(--ink);
+      font-size: 13.5px;
+      outline: none;
+    }
+    .search-line:focus { border-bottom-color: var(--brass); }
+    .search-line::placeholder { color: #676e66; }
+
+    .plate-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+      gap: 30px;
+    }
+    .plate {
+      background: var(--bg-card);
+      border: 1px solid var(--hairline);
+      border-radius: 3px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .plate:hover {
+      border-color: var(--brass-line);
+      transform: translateY(-3px);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.48);
+    }
+    .plate-frame {
+      position: relative;
+      display: block;
+      aspect-ratio: 16 / 10;
+      background: #0a0e0b;
+      overflow: hidden;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .plate-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .plate:hover .plate-img { transform: scale(1.045); }
+    .plate-monogram {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 24px;
+      text-align: center;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(212, 175, 106, 0.16), transparent 62%),
+        linear-gradient(145deg, #101712, #090c0a);
+    }
+    .plate-monogram span { font-family: var(--serif); font-size: 22px; color: var(--ink); letter-spacing: 0.05em; }
+    .plate-monogram em { font-style: normal; font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em; color: var(--brass); }
+    .plate-no {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      padding: 4px 10px;
+      background: rgba(7, 10, 8, 0.72);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.16em;
+      color: var(--ink-soft);
+    }
+    .plate-hover {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      padding: 6px 12px;
+      background: rgba(7, 10, 8, 0.8);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--brass-line);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--brass-pale);
+    }
+    .plate-placard { padding: 20px 22px 22px; display: flex; flex-direction: column; flex: 1; }
+    .plate-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    .plate-title { margin: 0; font-family: var(--serif); font-size: 19px; font-weight: 500; letter-spacing: 0.02em; color: var(--ink); }
+    .plate-author { font-size: 12px; letter-spacing: 0.06em; color: var(--muted); white-space: nowrap; }
+    .plate-desc {
+      margin: 0 0 18px;
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: #9ba39a;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .plate-foot {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--hairline);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .plate-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 11.5px; letter-spacing: 0.06em; color: var(--muted); }
+    .plate-tags b { font-weight: 400; color: rgba(212, 175, 106, 0.45); }
+    .plate-links { display: flex; align-items: center; gap: 14px; }
+    .text-action { background: transparent; border: 0; padding: 0; font-size: 12.5px; letter-spacing: 0.06em; color: var(--muted); cursor: pointer; white-space: nowrap; }
+    .text-action:hover { color: var(--ink); }
+    .text-action.brass { color: var(--brass-pale); }
+
+    @media (max-width: 720px) {
+      .hero-content { padding: 80px 18px 36px; }
+      .catalog-wrap { padding: 44px 18px 72px; }
+      .plate-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain-overlay" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand-lockup" href="./">
+      <span class="brand-name">JARDIN</span>
+      <span class="brand-sub">Interactive Archive</span>
+    </a>
+    <nav class="site-nav">
+      <a class="nav-link active" href="#collection">典藏目录</a>
+      <a class="nav-link" href="./upload.html">发布作品</a>
+      <a class="nav-link" href="./docs.html">上传文档</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="heroSection">
+    <div class="hero-scrim" aria-hidden="true"></div>
+    <div class="hero-content">
+      <div class="hero-plaque">
+        <div class="eyebrow">CURATED EXHIBITION · LOADING</div>
+        <h1 class="hero-title">JARDIN 互动典藏馆</h1>
+        <p class="hero-desc">正在载入馆藏展品...</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="catalog-wrap" id="collection">
+    <div class="catalog-header">
+      <div class="catalog-title-block">
+        <div class="eyebrow">PERMANENT COLLECTION</div>
+        <h2>典藏图录</h2>
+      </div>
+      <div class="catalog-count" id="catalogCount">00 ARCHIVED WORKS</div>
+    </div>
+
+    <div class="toolbar">
+      <div class="tab-row" id="tagFilters">
+        <button class="tab-btn active" type="button" data-tag="">全部 ALL</button>
+      </div>
+      <input class="search-line" id="searchInput" type="search" placeholder="检索题名、作者或标签..." />
+    </div>
+
+    <main class="plate-grid" id="worksGrid"></main>
+  </section>
+
+  <footer class="site-footer">
+    JARDIN INTERACTIVE ARCHIVE · HOSTED ON GITHUB PAGES
+  </footer>
+
+  <script>
+    var activeTag = '';
+    var allWorks = [];
+
+    function esc(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function padNo(n) { return String(n).padStart(2, '0'); }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes <= 0) return '';
+      if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function playHref(id) {
+      return './play.html?id=' + encodeURIComponent(id);
+    }
+
+    function assetHref(id, relPath) {
+      var clean = String(relPath || '').split('/').map(encodeURIComponent).join('/');
+      return './works/' + encodeURIComponent(id) + '/' + clean;
+    }
+
+    function renderHero(featured) {
+      var hero = document.getElementById('heroSection');
+      if (!featured) {
+        hero.innerHTML =
+          '<div class="hero-scrim" aria-hidden="true"></div>' +
+          '<div class="hero-content">' +
+            '<div class="hero-plaque">' +
+              '<div class="eyebrow">DIGITAL BOTANICAL & INTERACTIVE ART</div>' +
+              '<h1 class="hero-title">JARDIN · 互动壁纸典藏馆</h1>' +
+              '<p class="hero-desc">尚未上传展品。打开右上角「发布作品」，拖入单个 .html 即可立刻展出。</p>' +
+              '<div class="hero-actions"><a class="btn-brass" href="./upload.html">发布第一件作品 ↗</a></div>' +
+            '</div>' +
+          '</div>';
+        return;
+      }
+
+      hero.innerHTML =
+        '<iframe class="hero-stage" src="./works/' + encodeURIComponent(featured.id) + '/index.html" allow="camera; fullscreen; autoplay" title="' + esc(featured.title || featured.id) + '"></iframe>' +
+        '<div class="hero-scrim" aria-hidden="true"></div>' +
+        '<div class="hero-content">' +
+          '<div class="hero-plaque">' +
+            '<div class="eyebrow">CURATED EXHIBITION · NO. 01 · LIVE CANVAS</div>' +
+            '<h1 class="hero-title">' + esc(featured.title || featured.id) + '</h1>' +
+            '<p class="hero-desc">' + esc(featured.description || '沉浸式暗调交互作品 · 轻拂画布即可实时触发动态响应。') + '</p>' +
+            '<div class="hero-meta">' +
+              '<span>署名 / ' + esc(featured.author || 'JARDIN Studio') + '</span>' +
+              '<span class="dot">·</span>' +
+              '<span>鼠标直接划过画面即可体验互动</span>' +
+            '</div>' +
+            '<div class="hero-actions">' +
+              '<a class="btn-brass" href="' + playHref(featured.id) + '">进入全屏展厅 ↗</a>' +
+              '<a class="btn-wire" href="#collection">浏览典藏图录 ↓</a>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }
+
+    function renderFilters(works) {
+      var tags = [];
+      var seen = new Set();
+      works.forEach(function (w) {
+        (w.tags || []).forEach(function (t) {
+          if (t && !seen.has(t)) { seen.add(t); tags.push(t); }
+        });
+      });
+
+      var row = document.getElementById('tagFilters');
+      row.innerHTML = '<button class="tab-btn active" type="button" data-tag="">全部 ALL</button>' +
+        tags.map(function (t) {
+          return '<button class="tab-btn" type="button" data-tag="' + esc(t.toLowerCase()) + '">' + esc(t) + '</button>';
+        }).join('');
+
+      row.querySelectorAll('.tab-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          activeTag = btn.dataset.tag || '';
+          row.querySelectorAll('.tab-btn').forEach(function (el) { el.classList.toggle('active', el === btn); });
+          filterWorks();
+        });
+      });
+    }
+
+    function renderGrid(works) {
+      document.getElementById('catalogCount').textContent = padNo(works.length) + ' ARCHIVED WORKS';
+      var grid = document.getElementById('worksGrid');
+      if (!works.length) {
+        grid.innerHTML = '<div style="grid-column:1/-1;padding:48px;text-align:center;border:1px dashed var(--brass-line);color:var(--muted);">暂无展品</div>';
+        return;
+      }
+
+      grid.innerHTML = works.map(function (w, idx) {
+        var no = padNo(idx + 1);
+        var title = esc(w.title || w.id);
+        var author = esc(w.author || 'JARDIN Studio');
+        var desc = esc(w.description || '点击进入全屏展厅，移动指针实时交互体验。');
+        var href = playHref(w.id);
+        var cover = w.cover ? assetHref(w.id, w.cover) : '';
+        var tags = Array.isArray(w.tags) ? w.tags : [];
+        var metaFallback = [w.updatedAt ? String(w.updatedAt).slice(0, 10) : '', formatBytes(w.totalBytes)].filter(Boolean).join(' · ') || 'INTERACTIVE';
+
+        return (
+          '<article class="plate" data-title="' + title.toLowerCase() + '" data-author="' + author.toLowerCase() + '" data-tags="' + esc(tags.join(',')).toLowerCase() + '">' +
+            '<a class="plate-frame" href="' + href + '">' +
+              (cover
+                ? '<img class="plate-img" src="' + esc(cover) + '" alt="' + title + '" loading="lazy" />'
+                : '<div class="plate-monogram"><span>' + title + '</span><em>PLATE ' + no + '</em></div>') +
+              '<div class="plate-no">NO. ' + no + '</div>' +
+              '<div class="plate-hover">进入展厅 ↗</div>' +
+            '</a>' +
+            '<div class="plate-placard">' +
+              '<div class="plate-head">' +
+                '<h2 class="plate-title"><a href="' + href + '">' + title + '</a></h2>' +
+                '<span class="plate-author">' + author + '</span>' +
+              '</div>' +
+              '<p class="plate-desc">' + desc + '</p>' +
+              '<div class="plate-foot">' +
+                '<div class="plate-tags">' + (tags.length ? tags.map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('<b>·</b>') : '<span>' + esc(metaFallback) + '</span>') + '</div>' +
+                '<div class="plate-links">' +
+                  '<button class="text-action" type="button" data-copy="' + esc(w.id) + '">复制链接</button>' +
+                  '<a class="text-action brass" href="' + href + '">试玩 ↗</a>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</article>'
+        );
+      }).join('');
+
+      grid.querySelectorAll('[data-copy]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var target = new URL(playHref(btn.dataset.copy), window.location.href).href;
+          navigator.clipboard.writeText(target).then(function () {
+            var old = btn.textContent;
+            btn.textContent = '已复制 ✓';
+            setTimeout(function () { btn.textContent = old; }, 1400);
+          });
+        });
+      });
+    }
+
+    function filterWorks() {
+      var q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      document.querySelectorAll('#worksGrid .plate').forEach(function (card) {
+        var title = card.dataset.title || '';
+        var author = card.dataset.author || '';
+        var tags = card.dataset.tags || '';
+        var matchTag = !activeTag || tags.split(',').indexOf(activeTag) !== -1;
+        var matchQuery = !q || title.indexOf(q) !== -1 || author.indexOf(q) !== -1 || tags.indexOf(q) !== -1;
+        card.style.display = matchTag && matchQuery ? '' : 'none';
+      });
+    }
+
+    document.getElementById('searchInput').addEventListener('input', filterWorks);
+
+    fetch('./works/manifest.json?t=' + Date.now())
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        allWorks = Array.isArray(data) ? data : (data.works || []);
+        renderHero(allWorks[0] || null);
+        renderFilters(allWorks);
+        renderGrid(allWorks);
+      })
+      .catch(function (err) {
+        console.error('Failed to load manifest:', err);
+        renderHero(null);
+        renderGrid([]);
+      });
+  </script>
+</body>
+</html>
